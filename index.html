@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Günlük Okuma</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 600px; margin: 0 auto; color: #333; background: #f9f9f9; }
+        @media (prefers-color-scheme: dark) { body { color: #eee; background: #121212; } }
+        h1 { font-size: 1.5rem; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 20px; }
+        p { font-size: 1.2rem; }
+        .date { font-size: 0.9rem; color: #888; text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="date" id="dateDisplay"></div>
+    <h1 id="title">Yükleniyor...</h1>
+    <p id="content"></p>
+
+    <script>
+        // Uzun metinlerini barındıran YENİ JSON dosyasının raw linkini buraya ekleyeceğiz
+        const jsonUrl = 'SENIN_UZUN_METINLER_JSON_LINKIN_BURAYA_GELECEK';
+        
+        async function loadContent() {
+            try {
+                const now = new Date();
+                document.getElementById('dateDisplay').innerText = now.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                
+                const start = new Date(now.getFullYear(), 0, 0);
+                const diff = now - start;
+                const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+                
+                const response = await fetch(jsonUrl);
+                const data = await response.json();
+                
+                // Yılın kaçıncı günüysek o indeksteki yazıyı otomatik çeker
+                const item = data[dayOfYear % data.length];
+                document.getElementById('title').innerText = item.baslik;
+                document.getElementById('content').innerText = item.metin;
+            } catch (e) {
+                document.getElementById('title').innerText = "Hata oluştu";
+                document.getElementById('content').innerText = "Lütfen internet bağlantınızı kontrol edin veya linki doğrulayın.";
+            }
+        }
+        loadContent();
+    </script>
+</body>
+</html>
